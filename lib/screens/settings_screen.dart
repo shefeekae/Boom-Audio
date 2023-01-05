@@ -86,7 +86,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   showAboutDialog(
                       context: context,
                       applicationName: 'Boom Audio',
-                      applicationVersion: '1.0.0',
+                      applicationVersion: '1.0.1',
                       applicationLegalese: '© Boom Audio 2022');
                 },
                 title: const Text(
