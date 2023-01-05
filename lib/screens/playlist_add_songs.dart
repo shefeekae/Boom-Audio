@@ -85,14 +85,16 @@ class _SongListPageState extends State<SongListPage> {
                                     ),
                                     artworkFit: BoxFit.fill,
                                   ),
-                                  title: SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Text(
-                                          item.data![index].displayNameWOExt)),
-                                  subtitle: SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child:
-                                          Text("${item.data![index].artist}")),
+                                  title: Text(
+                                    item.data![index].displayNameWOExt,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  subtitle: Text(
+                                    "${item.data![index].artist}",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                   trailing: IconButton(
                                       onPressed: () {
                                         setState(() {

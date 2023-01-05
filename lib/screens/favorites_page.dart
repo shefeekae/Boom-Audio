@@ -90,8 +90,16 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                         size: 52,
                                       ),
                                     ),
-                                    title: Text(favorData[index].title),
-                                    subtitle: Text(favorData[index].artist!),
+                                    title: Text(
+                                      favorData[index].title,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    subtitle: Text(
+                                      favorData[index].artist!,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                     trailing: IconButton(
                                         onPressed: () {
                                           FavoriteDB.favoriteSongs

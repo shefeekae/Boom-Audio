@@ -6,7 +6,7 @@ Widget shareLink(BuildContext context) {
     body: FutureBuilder(
       future: Future.delayed(const Duration(milliseconds: 20), () {
         return Share.share(
-            'https://play.google.com/store/apps/details?id=in.brototype.melody_beatz');
+            'https://play.google.com/store/apps/details?id=com.shefeek1999.music_app');
       }),
       builder: (context, AsyncSnapshot snapshot) {
         return snapshot.data;

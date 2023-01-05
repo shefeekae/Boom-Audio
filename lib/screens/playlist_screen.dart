@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:music_app/database/song_db.dart';
+import 'package:music_app/screens/currently_playing.dart';
 import 'package:music_app/widgets/animated_text.dart';
 import 'package:music_app/widgets/neu_box_widget.dart';
 import 'package:music_app/screens/playlist_folder.dart';
-
 import '../database/playlist_functions.dart';
 
 class PlaylistScreen extends StatefulWidget {
@@ -103,6 +102,10 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                                               .deleteAt(index);
                                                           Navigator.pop(
                                                               context);
+                                                          PlaylistDB
+                                                              .playlistnotifier
+                                                              .value
+                                                              .removeAt(index);
                                                         },
                                                         child: const Text(
                                                           'Yes',
@@ -185,8 +188,12 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                                 BorderRadius.circular(20)),
                                       ),
                                       validator: (value) {
+                                        bool check = playlistNameCheck(value);
+
                                         if (value!.isEmpty) {
                                           return "Playlist Name is required";
+                                        } else if (check) {
+                                          return "$value already exist in playlist ";
                                         } else {
                                           return null;
                                         }
@@ -261,6 +268,20 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
         );
       },
     );
+  }
+
+  bool playlistNameCheck(name) {
+    bool result = false;
+
+    for (int i = 0; i < PlaylistDB.playlistnotifier.value.length; i++) {
+      if (name == PlaylistDB.playlistnotifier.value[i].name) {
+        result = true;
+      }
+      if (result == true) {
+        break;
+      }
+    }
+    return result;
   }
 
   Future<void> whenButtonClicked() async {

@@ -138,8 +138,16 @@ class _PlaylistFolderState extends State<PlaylistFolder> {
                             size: 52,
                           ),
                         ),
-                        title: Text(playlistSong[index].title),
-                        subtitle: Text(playlistSong[index].artist!),
+                        title: Text(
+                          playlistSong[index].title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: Text(
+                          playlistSong[index].artist!,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
                         trailing: PopupMenuButton(
                           color: Colors.grey[300],
                           itemBuilder: (context) {

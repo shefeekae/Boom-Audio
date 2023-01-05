@@ -154,16 +154,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const Divider(
                 color: Colors.grey,
               ),
-              // ListTile(
-              //   onTap: () {
-              //     // shareLink(context);
-              //   },
-              //   title: const Text('Share',
-              //       style: TextStyle(color: Colors.black, fontSize: 18)),
-              // ),
-              // const Divider(
-              //   color: Colors.grey,
-              // ),
+              ListTile(
+                onTap: () {
+                  shareLink(context);
+                },
+                title: const Text('Share',
+                    style: TextStyle(color: Colors.black, fontSize: 18)),
+              ),
+              const Divider(
+                color: Colors.grey,
+              ),
               ListTile(
                 onTap: () {
                   showDialog(

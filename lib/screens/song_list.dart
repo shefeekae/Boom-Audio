@@ -132,10 +132,15 @@ class _SongLibraryState extends State<SongLibrary> {
                           height: 100,
                           child: NeuBox(
                               child: ListTile(
-                            title: Text(item.data![index].title),
+                            title: Text(
+                              item.data![index].title,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
                             subtitle: Text(
                               item.data![index].artist!,
                               overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
                             trailing: FavoriteButton(song: item.data![index]),
                             leading: QueryArtworkWidget(
