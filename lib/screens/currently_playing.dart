@@ -435,7 +435,8 @@ class _CurrentlyPlayingState extends State<CurrentlyPlaying> {
                                   onChanged: (volume) {
                                     currentVol = volume;
                                     PerfectVolumeControl.setVolume(volume);
-                                    setState(() {});
+                                    // setState(() {});
+                                    provider.notifyListeners();
                                   }),
                             ),
                             const Icon(Icons.volume_up)
