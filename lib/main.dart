@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:music_app/database/favorite_functions.dart';
+import 'package:music_app/database/playlist_functions.dart';
 import 'package:music_app/database/song_db.dart';
-
-import 'package:music_app/screens/navigation_screen.dart';
+import 'package:music_app/functions/get_songs.dart';
+import 'package:music_app/functions/playlist_check.dart';
+import 'package:music_app/functions/show_miniplayer.dart';
 import 'package:music_app/screens/splash_screen.dart';
+import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,9 +33,28 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => FavoriteDB(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => PlaylistDB(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => CheckPlaylist(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => GetSongs(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ShowMiniPlayer(),
+        )
+      ],
+      child: const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: SplashScreen(),
+      ),
     );
   }
 }

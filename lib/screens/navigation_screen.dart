@@ -2,19 +2,16 @@
 
 import 'package:flutter/material.dart';
 import 'package:miniplayer/miniplayer.dart';
-
 import 'package:music_app/database/favorite_functions.dart';
 import 'package:music_app/functions/get_songs.dart';
-
-import 'package:music_app/screens/currently_playing.dart';
-
+import 'package:music_app/functions/show_miniplayer.dart';
 import 'package:music_app/screens/favorites_page.dart';
 import 'package:music_app/screens/playlist_screen.dart';
 import 'package:music_app/screens/search_screen.dart';
-
 import 'package:music_app/screens/song_list.dart';
 import 'package:music_app/widgets/mini_player.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+import 'package:provider/provider.dart';
 
 class BottomNavigation extends StatefulWidget {
   const BottomNavigation({super.key});
@@ -41,28 +38,28 @@ class _BottomNavigationState extends State<BottomNavigation> {
         index: _currentIndex,
         children: screens,
       ),
-      bottomNavigationBar: ValueListenableBuilder(
-        valueListenable: playingSongNotifier,
-        builder: (context, List<SongModel> music, child) => Column(
+      bottomNavigationBar: Consumer<ShowMiniPlayer>(
+        builder: (context, provider, child) => Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (GetSongs.player.currentIndex != null)
-              ValueListenableBuilder(
-                  valueListenable: playingSongNotifier,
-                  builder: (BuildContext context, playingSong, child) {
-                    return Miniplayer(
-                      minHeight: 60,
-                      maxHeight: 60,
-                      builder: (height, percentage) {
-                        // return MiniplayerWillPopScope(
-                        //     child: child, onWillPop: onWillPop);
+            if (Provider.of<GetSongs>(context, listen: false)
+                    .player
+                    .currentIndex !=
+                null)
+              Miniplayer(
+                minHeight: 60,
+                maxHeight: 60,
+                builder: (height, percentage) {
+                  // return MiniplayerWillPopScope(
+                  //     child: child, onWillPop: onWillPop);
 
-                        return MiniPlayerWidget(
-                          miniPlayerSong: GetSongs.playingSongs,
-                        );
-                      },
-                    );
-                  })
+                  return MiniPlayerWidget(
+                    miniPlayerSong:
+                        Provider.of<GetSongs>(context, listen: false)
+                            .playingSongs,
+                  );
+                },
+              )
             else
               const SizedBox.shrink(),
             const Divider(
@@ -88,8 +85,11 @@ class _BottomNavigationState extends State<BottomNavigation> {
               onTap: (index) {
                 setState(() {
                   _currentIndex = index;
-                  FavoriteDB.favoriteSongs.notifyListeners();
-                  playingSongNotifier.notifyListeners();
+                  Provider.of<FavoriteDB>(context, listen: false)
+                      .notifyListeners();
+
+                  Provider.of<ShowMiniPlayer>(context, listen: false)
+                      .notifyListeners();
                 });
               },
             ),

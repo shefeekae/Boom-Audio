@@ -6,6 +6,7 @@ import 'package:music_app/widgets/favorite_button.dart';
 import 'package:music_app/widgets/neu_box_widget.dart';
 import 'package:music_app/screens/song_list.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+import 'package:provider/provider.dart';
 
 import '../functions/show_miniplayer.dart';
 
@@ -80,13 +81,23 @@ class _SearchScreenState extends State<SearchScreen> {
                             trailing: FavoriteButton(song: _foundSongs[index]),
                             onTap: () {
                               FocusScope.of(context).unfocus();
-                              GetSongs.player.setAudioSource(
-                                  GetSongs.createSongList(_foundSongs),
-                                  initialIndex: index);
-                              GetSongs.player.play();
+                              Provider.of<GetSongs>(context, listen: false)
+                                  .player
+                                  .setAudioSource(
+                                      Provider.of<GetSongs>(context,
+                                              listen: false)
+                                          .createSongList(_foundSongs),
+                                      initialIndex: index);
+                              Provider.of<GetSongs>(context, listen: false)
+                                  .player
+                                  .play();
 
-                              ShowMiniPlayer.updateMiniPlayer(
-                                  songlist: GetSongs.playingSongs);
+                              Provider.of<ShowMiniPlayer>(context,
+                                      listen: false)
+                                  .updateMiniPlayer(
+                                      songlist: Provider.of<GetSongs>(context,
+                                              listen: false)
+                                          .playingSongs);
                             },
                           ),
                         ),

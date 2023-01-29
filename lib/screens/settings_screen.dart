@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:miniplayer/miniplayer.dart';
 import 'package:music_app/functions/reset_app.dart';
-import 'package:music_app/screens/currently_playing.dart';
+import 'package:music_app/functions/show_miniplayer.dart';
 import 'package:music_app/widgets/mini_player.dart';
 import 'package:music_app/widgets/share_link.dart';
-import 'package:on_audio_query/on_audio_query.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import '../functions/get_songs.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -37,25 +37,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black),
           ),
         ),
-        bottomNavigationBar: ValueListenableBuilder(
-          valueListenable: playingSongNotifier,
-          builder: (context, List<SongModel> music, child) => Column(
+        bottomNavigationBar: Consumer<ShowMiniPlayer>(
+          builder: (context, provider, child) => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (GetSongs.player.currentIndex != null)
-                ValueListenableBuilder(
-                    valueListenable: playingSongNotifier,
-                    builder: (BuildContext context, playingSong, child) {
-                      return Miniplayer(
-                        minHeight: 60,
-                        maxHeight: 60,
-                        builder: (height, percentage) {
-                          return MiniPlayerWidget(
-                            miniPlayerSong: playingSong,
-                          );
-                        },
-                      );
-                    })
+              if (Provider.of<GetSongs>(context, listen: false)
+                      .player
+                      .currentIndex !=
+                  null)
+                Miniplayer(
+                  minHeight: 60,
+                  maxHeight: 60,
+                  builder: (height, percentage) {
+                    return MiniPlayerWidget(
+                      miniPlayerSong: provider.miniPlayerNotifier,
+                    );
+                  },
+                )
               else
                 const SizedBox.shrink(),
             ],

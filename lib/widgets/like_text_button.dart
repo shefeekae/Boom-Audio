@@ -3,20 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:music_app/database/favorite_functions.dart';
 import 'package:music_app/functions/is_liked.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+import 'package:provider/provider.dart';
 
 class FavoriteTextButton extends StatelessWidget {
-  const FavoriteTextButton({super.key, required this.song});
+  FavoriteTextButton({super.key, required this.song});
   final SongModel song;
+
+  LikeSong likeSong = LikeSong();
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: FavoriteDB.favoriteSongs,
-      builder: (context, List<SongModel> favorData, child) {
+    return Consumer<FavoriteDB>(
+      builder: (context, provider, child) {
         return TextButton(
             onPressed: () {
-              LikeSong.likeTheSong(song: song);
+              likeSong.likeTheSong(song: song, context: context);
             },
-            child: FavoriteDB.isfavor(song)
+            child: provider.isfavor(song)
                 ? const Text(
                     'Remove from favorites',
                     style: TextStyle(color: Colors.red),

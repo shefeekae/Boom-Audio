@@ -7,6 +7,7 @@ import 'package:music_app/widgets/favorite_button.dart';
 import 'package:music_app/widgets/neu_box_widget.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 
 class SongLibrary extends StatefulWidget {
   const SongLibrary({Key? key}) : super(key: key);
@@ -38,7 +39,7 @@ class _SongLibraryState extends State<SongLibrary> {
     //  Choose the better location(page) to add this method.
     // _audioRoom.closeRoom();
 
-    GetSongs.player.dispose();
+    Provider.of<GetSongs>(context, listen: false).player.dispose();
     super.dispose();
   }
 
@@ -113,10 +114,14 @@ class _SongLibraryState extends State<SongLibrary> {
                   SongLibrary.songs.clear();
                   SongLibrary.songs = item.data!;
 
-                  if (!FavoriteDB.isInitialized) {
-                    FavoriteDB.initialise(item.data!);
+                  if (!Provider.of<FavoriteDB>(context, listen: false)
+                      .isInitialized) {
+                    Provider.of<FavoriteDB>(context, listen: false)
+                        .initialise(item.data!);
                   }
-                  GetSongs.songsCopy = item.data!;
+
+                  Provider.of<GetSongs>(context, listen: false).songsCopy =
+                      item.data!;
 
                   // updateSongList(songList: item.data!);
 
@@ -130,56 +135,59 @@ class _SongLibraryState extends State<SongLibrary> {
                             horizontal: 12, vertical: 8),
                         child: SizedBox(
                           height: 100,
-                          child: NeuBox(
-                              child: ListTile(
-                            title: Text(
-                              item.data![index].title,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
-                            subtitle: Text(
-                              item.data![index].artist!,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
-                            trailing: FavoriteButton(song: item.data![index]),
-                            leading: QueryArtworkWidget(
-                              artworkBorder: BorderRadius.circular(4),
-                              id: item.data![index].id,
-                              type: ArtworkType.AUDIO,
-                              nullArtworkWidget: const Icon(
-                                Icons.music_note_rounded,
-                                color: Colors.black54,
-                                size: 52,
+                          child: NeuBox(child: Consumer<GetSongs>(
+                              builder: (context, provider, child) {
+                            return ListTile(
+                              title: Text(
+                                item.data![index].title,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
                               ),
-                            ),
-                            onTap: () async {
-                              //show the player view
+                              subtitle: Text(
+                                item.data![index].artist!,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                              trailing: FavoriteButton(song: item.data![index]),
+                              leading: QueryArtworkWidget(
+                                artworkBorder: BorderRadius.circular(4),
+                                id: item.data![index].id,
+                                type: ArtworkType.AUDIO,
+                                nullArtworkWidget: const Icon(
+                                  Icons.music_note_rounded,
+                                  color: Colors.black54,
+                                  size: 52,
+                                ),
+                              ),
+                              onTap: () async {
+                                //show the player view
 
-                              // playingSongNotifier.notifyListeners();
+                                // playingSongNotifier.notifyListeners();
 
-                              List<SongModel> newlist = [...item.data!];
+                                List<SongModel> newlist = [...item.data!];
 
-                              await GetSongs.player.setAudioSource(
-                                  GetSongs.createSongList(newlist),
-                                  initialIndex: index);
+                                await provider.player.setAudioSource(
+                                    provider.createSongList(newlist),
+                                    initialIndex: index);
 
-                              await ShowMiniPlayer.updateMiniPlayer(
-                                  songlist: newlist);
+                                await Provider.of<ShowMiniPlayer>(context,
+                                        listen: false)
+                                    .updateMiniPlayer(songlist: newlist);
 
-                              await GetSongs.player.play();
+                                await provider.player.play();
 
-                              // GetSongs.player.currentIndexStream
-                              //     .listen((index) {
-                              //   if (index != null && mounted) {
-                              //     // setState(() {
-                              //     //   // currentIndex = index;
-                              //     // });
-                              //     GetSongs.currentIndex = index;
-                              //   }
-                              // });
-                            },
-                          )),
+                                // GetSongs.player.currentIndexStream
+                                //     .listen((index) {
+                                //   if (index != null && mounted) {
+                                //     // setState(() {
+                                //     //   // currentIndex = index;
+                                //     // });
+                                //     GetSongs.currentIndex = index;
+                                //   }
+                                // });
+                              },
+                            );
+                          })),
                         ),
                       );
                     },
@@ -203,7 +211,7 @@ class _SongLibraryState extends State<SongLibrary> {
 
 //duration class
 
-class DurationState {
-  Duration position, total;
-  DurationState({this.position = Duration.zero, this.total = Duration.zero});
-}
+// class DurationState {
+//   Duration position, total;
+//   DurationState({this.position = Duration.zero, this.total = Duration.zero});
+// }

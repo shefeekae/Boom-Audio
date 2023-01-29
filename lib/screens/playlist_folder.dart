@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:miniplayer/miniplayer.dart';
 import 'package:music_app/database/playlist_functions.dart';
 import 'package:music_app/database/song_db.dart';
-
 import 'package:music_app/functions/show_miniplayer.dart';
 import 'package:music_app/screens/currently_playing.dart';
 import 'package:music_app/widgets/like_text_button.dart';
@@ -12,25 +9,21 @@ import 'package:music_app/widgets/mini_player.dart';
 import 'package:music_app/widgets/neu_box_widget.dart';
 import 'package:music_app/screens/playlist_add_songs.dart';
 import 'package:on_audio_query/on_audio_query.dart';
-
+import 'package:provider/provider.dart';
 import '../functions/get_songs.dart';
 
-class PlaylistFolder extends StatefulWidget {
-  const PlaylistFolder(
+class PlaylistFolder extends StatelessWidget {
+  PlaylistFolder(
       {super.key, required this.playlist, required this.folderIndex});
 
   final Songs playlist;
   final int folderIndex;
-  @override
-  State<PlaylistFolder> createState() => _PlaylistFolderState();
-}
-
-class _PlaylistFolderState extends State<PlaylistFolder> {
   late List<SongModel> playlistSong;
 
   @override
   Widget build(BuildContext context) {
-    PlaylistDB.getPlaylist();
+    // PlaylistDB.getPlaylist();
+    Provider.of<PlaylistDB>(context).getPlaylist();
     return Scaffold(
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
@@ -45,25 +38,23 @@ class _PlaylistFolderState extends State<PlaylistFolder> {
         backgroundColor: Colors.grey[300],
         elevation: 0,
       ),
-      bottomNavigationBar: ValueListenableBuilder(
-        valueListenable: playingSongNotifier,
-        builder: (context, List<SongModel> music, child) => Column(
+      bottomNavigationBar: Consumer<ShowMiniPlayer>(
+        builder: (context, provider, child) => Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (GetSongs.player.currentIndex != null)
-              ValueListenableBuilder(
-                  valueListenable: playingSongNotifier,
-                  builder: (BuildContext context, playingSong, child) {
-                    return Miniplayer(
-                      minHeight: 60,
-                      maxHeight: 60,
-                      builder: (height, percentage) {
-                        return MiniPlayerWidget(
-                          miniPlayerSong: playingSong,
-                        );
-                      },
-                    );
-                  })
+            if (Provider.of<GetSongs>(context, listen: false)
+                    .player
+                    .currentIndex !=
+                null)
+              Miniplayer(
+                minHeight: 60,
+                maxHeight: 60,
+                builder: (height, percentage) {
+                  return MiniPlayerWidget(
+                    miniPlayerSong: provider.miniPlayerNotifier,
+                  );
+                },
+              )
             else
               const SizedBox.shrink(),
           ],
@@ -76,7 +67,7 @@ class _PlaylistFolderState extends State<PlaylistFolder> {
               child: Column(
             children: [
               Text(
-                widget.playlist.name.toUpperCase(),
+                playlist.name.toUpperCase(),
                 style: const TextStyle(
                     color: Colors.black,
                     fontSize: 30,
@@ -88,8 +79,7 @@ class _PlaylistFolderState extends State<PlaylistFolder> {
                 child: TextButton(
                   onPressed: () {
                     Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          SongListPage(playlist: widget.playlist),
+                      builder: (context) => SongListPage(playlist: playlist),
                     ));
                   },
                   child: const Text(
@@ -98,11 +88,11 @@ class _PlaylistFolderState extends State<PlaylistFolder> {
                   ),
                 ),
               ),
-              ValueListenableBuilder(
-                valueListenable: Hive.box<Songs>('playlistDB').listenable(),
-                builder: (context, Box<Songs> value, child) {
-                  playlistSong = listPlaylist(
-                      value.values.toList()[widget.folderIndex].songIds);
+              Consumer<PlaylistDB>(
+                builder: (context, provider, child) {
+                  playlistSong = provider.listPlaylist(
+                      provider.boxNotifier.values.toList()[folderIndex].songIds,
+                      context);
 
                   return ListView.separated(
                     shrinkWrap: true,
@@ -114,19 +104,20 @@ class _PlaylistFolderState extends State<PlaylistFolder> {
                         onTap: () async {
                           List<SongModel> newList = [...playlistSong];
 
-                          await GetSongs.player.setAudioSource(
-                              GetSongs.createSongList(newList),
-                              initialIndex: index);
+                          await Provider.of<GetSongs>(context, listen: false)
+                              .player
+                              .setAudioSource(
+                                  Provider.of<GetSongs>(context, listen: false)
+                                      .createSongList(newList),
+                                  initialIndex: index);
 
-                          // Navigator.of(context).push(MaterialPageRoute(
-                          //   builder: (context) =>
-                          //       CurrentlyPlaying(playerSong: playlistSong),
-                          // ));
+                          await Provider.of<ShowMiniPlayer>(context,
+                                  listen: false)
+                              .updateMiniPlayer(songlist: newList);
 
-                          await ShowMiniPlayer.updateMiniPlayer(
-                              songlist: newList);
-
-                          await GetSongs.player.play();
+                          await Provider.of<GetSongs>(context, listen: false)
+                              .player
+                              .play();
                         },
                         leading: QueryArtworkWidget(
                           artworkBorder: BorderRadius.circular(4),
@@ -180,12 +171,12 @@ class _PlaylistFolderState extends State<PlaylistFolder> {
                                                     )),
                                                 TextButton(
                                                     onPressed: () {
-                                                      widget.playlist
-                                                          .deleteData(
-                                                              playlistSong[
-                                                                      index]
-                                                                  .id);
+                                                      playlist.deleteData(
+                                                          playlistSong[index]
+                                                              .id);
                                                       Navigator.pop(context);
+                                                      provider
+                                                          .notifyListeners();
                                                     },
                                                     child: const Text(
                                                       'Yes',
@@ -221,17 +212,5 @@ class _PlaylistFolderState extends State<PlaylistFolder> {
         ),
       ),
     );
-  }
-
-  List<SongModel> listPlaylist(List<int> data) {
-    List<SongModel> plSongs = [];
-    for (int i = 0; i < GetSongs.songsCopy.length; i++) {
-      for (int j = 0; j < data.length; j++) {
-        if (GetSongs.songsCopy[i].id == data[j]) {
-          plSongs.add(GetSongs.songsCopy[i]);
-        }
-      }
-    }
-    return plSongs;
   }
 }

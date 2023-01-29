@@ -3,29 +3,53 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:music_app/database/song_db.dart';
+import 'package:music_app/functions/get_songs.dart';
+import 'package:on_audio_query/on_audio_query.dart';
+import 'package:provider/provider.dart';
 
-class PlaylistDB {
-  static ValueNotifier<List<Songs>> playlistnotifier = ValueNotifier([]);
+class PlaylistDB extends ChangeNotifier {
+  List<Songs> playlistNotifier = [];
 
-  static Future<void> playlistAdd(Songs value) async {
-    final playListDb = Hive.box<Songs>('playlistDB');
-    await playListDb.add(value);
+  Box<Songs> boxNotifier = Hive.box<Songs>('playlistDB');
 
-    playlistnotifier.value.add(value);
+  // static ValueNotifier<List<Songs>> playlistnotifier = ValueNotifier([]);
+
+  Future<void> playlistAdd(Songs value) async {
+    // final playListDb = Hive.box<Songs>('playlistDB');
+    await boxNotifier.add(value);
+
+    playlistNotifier.add(value);
+    notifyListeners();
   }
 
-  static Future<void> getPlaylist() async {
-    final playListDb = Hive.box<Songs>('playlistDB');
-    playlistnotifier.value.clear();
-    playlistnotifier.value.addAll(playListDb.values);
-
-    playlistnotifier.notifyListeners();
+  Future<void> getPlaylist() async {
+    // final playListDb = Hive.box<Songs>('playlistDB');
+    playlistNotifier.clear();
+    playlistNotifier.addAll(boxNotifier.values);
+    // notifyListeners();
   }
 
-  static Future<void> playlistDelete(int index) async {
-    final playListDb = Hive.box<Songs>('playlistDB');
+  Future<void> playlistDelete(int index) async {
+    // final playListDb = Hive.box<Songs>('playlistDB');
 
-    await playListDb.deleteAt(index);
+    await boxNotifier.deleteAt(index);
     getPlaylist();
+    notifyListeners();
+  }
+
+  List<SongModel> listPlaylist(List<int> data, BuildContext context) {
+    List<SongModel> plSongs = [];
+    for (int i = 0;
+        i < Provider.of<GetSongs>(context, listen: false).songsCopy.length;
+        i++) {
+      for (int j = 0; j < data.length; j++) {
+        if (Provider.of<GetSongs>(context, listen: false).songsCopy[i].id ==
+            data[j]) {
+          plSongs
+              .add(Provider.of<GetSongs>(context, listen: false).songsCopy[i]);
+        }
+      }
+    }
+    return plSongs;
   }
 }

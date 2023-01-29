@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:music_app/database/playlist_functions.dart';
 import 'package:music_app/database/song_db.dart';
+import 'package:music_app/functions/playlist_check.dart';
 import 'package:music_app/widgets/neu_box_widget.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+import 'package:provider/provider.dart';
 
-class SongListPage extends StatefulWidget {
-  const SongListPage({super.key, required this.playlist});
+class SongListPage extends StatelessWidget {
+  SongListPage({super.key, required this.playlist});
   final Songs playlist;
-  @override
-  State<SongListPage> createState() => _SongListPageState();
-}
-
-class _SongListPageState extends State<SongListPage> {
   OnAudioQuery audioQuery = OnAudioQuery();
 
   @override
@@ -36,6 +34,9 @@ class _SongListPageState extends State<SongListPage> {
                       TextButton(
                           onPressed: () {
                             Navigator.of(context).pop();
+
+                            Provider.of<PlaylistDB>(context, listen: false)
+                                .notifyListeners();
                           },
                           child: const Text(
                             'Done',
@@ -72,44 +73,50 @@ class _SongListPageState extends State<SongListPage> {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemBuilder: (context, index) {
-                          return NeuBox(
-                              child: ListTile(
-                                  leading: QueryArtworkWidget(
-                                    artworkBorder: BorderRadius.circular(4),
-                                    id: item.data![index].id,
-                                    type: ArtworkType.AUDIO,
-                                    nullArtworkWidget: const Icon(
-                                      Icons.music_note_rounded,
-                                      color: Colors.black54,
-                                      size: 52,
-                                    ),
-                                    artworkFit: BoxFit.fill,
+                          return NeuBox(child: Consumer<CheckPlaylist>(
+                              builder: (context, provider, child) {
+                            return ListTile(
+                                leading: QueryArtworkWidget(
+                                  artworkBorder: BorderRadius.circular(4),
+                                  id: item.data![index].id,
+                                  type: ArtworkType.AUDIO,
+                                  nullArtworkWidget: const Icon(
+                                    Icons.music_note_rounded,
+                                    color: Colors.black54,
+                                    size: 52,
                                   ),
-                                  title: Text(
-                                    item.data![index].displayNameWOExt,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  subtitle: Text(
-                                    "${item.data![index].artist}",
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  trailing: IconButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          playlistCheck(item.data![index]);
-                                          //     playlistnotifier.notifyListeners();
-                                        });
-                                      },
-                                      icon: !widget.playlist
-                                              .isValueIn(item.data![index].id)
-                                          ? const Icon(Icons.add)
-                                          : const Icon(Icons.remove_circle),
-                                      color: !widget.playlist
-                                              .isValueIn(item.data![index].id)
-                                          ? Colors.black
-                                          : Colors.red)));
+                                  artworkFit: BoxFit.fill,
+                                ),
+                                title: Text(
+                                  item.data![index].displayNameWOExt,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                subtitle: Text(
+                                  "${item.data![index].artist}",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                trailing: IconButton(
+                                    onPressed: () {
+                                      // provider.playlistCheck(
+                                      //     item.data![index], widget.playlist);
+                                      provider.playlistCheck(
+                                          item.data![index], playlist);
+                                      Provider.of<CheckPlaylist>(context,
+                                              listen: false)
+                                          .notifyListeners();
+                                      //     playlistnotifier.notifyListeners();
+                                    },
+                                    icon: !playlist
+                                            .isValueIn(item.data![index].id)
+                                        ? const Icon(Icons.add)
+                                        : const Icon(Icons.remove_circle),
+                                    color: !playlist
+                                            .isValueIn(item.data![index].id)
+                                        ? Colors.black
+                                        : Colors.red));
+                          }));
                         },
                         separatorBuilder: (context, index) {
                           return const Divider();
@@ -123,28 +130,5 @@ class _SongListPageState extends State<SongListPage> {
         ),
       ),
     );
-  }
-
-  void playlistCheck(SongModel data) {
-    if (!widget.playlist.isValueIn(data.id)) {
-      widget.playlist.add(data.id);
-      // const snackbar = SnackBar(
-      //     backgroundColor: Colors.black,
-      //     content: Text(
-      //       'Added to Playlist',
-      //       style: TextStyle(color: Colors.white),
-      //     ));
-      // ScaffoldMessenger.of(context).showSnackBar(snackbar);
-    } else {
-      widget.playlist.deleteData(data.id);
-      // const snackbar = SnackBar(
-      //   backgroundColor: Colors.black,
-      //   content: Text(
-      //     'Song Deleted',
-      //     style: TextStyle(color: Colors.red),
-      //   ),
-      // );
-      // ScaffoldMessenger.of(context).showSnackBar(snackbar);
-    }
   }
 }
