@@ -10,7 +10,6 @@ import 'package:music_app/screens/playlist_screen.dart';
 import 'package:music_app/screens/search_screen.dart';
 import 'package:music_app/screens/song_list.dart';
 import 'package:music_app/widgets/mini_player.dart';
-import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
 
 class BottomNavigation extends StatefulWidget {

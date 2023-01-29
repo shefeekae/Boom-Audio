@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:music_app/screens/navigation_screen.dart';
 
 class SplashScreen extends StatefulWidget {

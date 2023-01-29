@@ -11,9 +11,7 @@ import 'package:on_audio_query/on_audio_query.dart';
 import 'package:perfect_volume_control/perfect_volume_control.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
-
 import '../functions/duration_state.dart';
-import 'song_list.dart';
 import '../widgets/neu_box_widget.dart';
 
 // ignore: must_be_immutable

@@ -1,9 +1,10 @@
+// ignore_for_file: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member, use_build_context_synchronously, must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:miniplayer/miniplayer.dart';
 import 'package:music_app/database/playlist_functions.dart';
 import 'package:music_app/database/song_db.dart';
 import 'package:music_app/functions/show_miniplayer.dart';
-import 'package:music_app/screens/currently_playing.dart';
 import 'package:music_app/widgets/like_text_button.dart';
 import 'package:music_app/widgets/mini_player.dart';
 import 'package:music_app/widgets/neu_box_widget.dart';

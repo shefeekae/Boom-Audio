@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable, invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
+
 import 'package:flutter/material.dart';
 import 'package:music_app/database/playlist_functions.dart';
 import 'package:music_app/database/song_db.dart';

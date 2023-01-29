@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:music_app/database/favorite_functions.dart';
 import 'package:music_app/functions/get_songs.dart';
