@@ -9,14 +9,6 @@ class GetSongs extends ChangeNotifier {
   List<SongModel> songsCopy = [];
   List<SongModel> playingSongs = [];
 
-  //duration state stream
-  // Stream<DurationState> get _durationStateStream =>
-  //     Rx.combineLatest2<Duration, Duration?, DurationState>(
-  //         player.positionStream,
-  //         player.durationStream,
-  //         (position, duration) => DurationState(
-  //             position: position, total: duration ?? Duration.zero));
-
   ConcatenatingAudioSource createSongList(List<SongModel> songs) {
     List<AudioSource> sources = [];
     playingSongs = songs;
